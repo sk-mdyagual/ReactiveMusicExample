@@ -23,15 +23,23 @@ public class AlbumServiceImpl implements IAlbumService {
 
     @Override
     public Mono<ResponseEntity<Flux<AlbumDTO>>> findAllAlbums() {
-        return null;
+
+        return Mono.justOrEmpty(new ResponseEntity<>(this.iAlbumRepository
+                                .findAll()
+                                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NO_CONTENT.toString())))
+                                .map(this::entityToDTO),HttpStatus.FOUND))
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)));
     }
 
     @Override
     public Mono<ResponseEntity<AlbumDTO>> findAlbumById(String id) {
+        //Handling errors
         return this.iAlbumRepository
                 .findById(id)
-                .map(album -> entityToDTO(album))
-                .map(albumDTO -> new ResponseEntity<>(albumDTO, HttpStatus.FOUND)); //Mono<ResponseEntity<AlbumDTO>>
+                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString()))) //Capture the error
+                .map(this::entityToDTO)
+                .map(albumDTO -> new ResponseEntity<>(albumDTO, HttpStatus.FOUND)) //Mono<ResponseEntity<AlbumDTO>>
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST))); //Handle the error
     }
 
     @Override
