@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,11 +17,12 @@ import java.time.LocalTime;
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class Song {
     @Id
-    private String idSong;
+    private String idSong= UUID.randomUUID().toString().substring(0, 10);
     private String name;
+    private String idAlbum;
     private String lyricsBy;
     private String producedBy;
     private String arrangedBy;
-    private LocalTime timestamp;
+    private LocalTime duration;
 
 }

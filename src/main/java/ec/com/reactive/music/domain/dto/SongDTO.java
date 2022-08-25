@@ -9,15 +9,16 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+//@Getter
+//@Setter
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class SongDTO {
-    private String idSong= UUID.randomUUID().toString().substring(0, 10);
+    private String idSong;
     private String name;
+    private String idAlbum;
     private String lyricsBy;
     private String producedBy;
     private String arrangedBy;
-    private LocalTime timestamp;
+    private LocalTime duration;
 
 }
