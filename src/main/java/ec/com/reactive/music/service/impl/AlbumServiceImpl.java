@@ -31,13 +31,15 @@ public class AlbumServiceImpl implements IAlbumService {
                                 .map(this::entityToDTO),HttpStatus.FOUND))
                 .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NO_CONTENT)));*/
         //This is the correct solution: You have to replicated for songs as well
+        //albumDTOS ->  new ResponseEntity<>(Flux.fromIterable(albumDTOS),HttpStatus.FOUND)
         return this.iAlbumRepository
                 .findAll()
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NO_CONTENT.toString())))
-                .map(this::entityToDTO)
+                .map(album -> entityToDTO(album))
                 .collectList()
-                .map(albumDTOS ->  new ResponseEntity<>(Flux.fromIterable(albumDTOS),HttpStatus.FOUND))
+                .map(albumDTOS -> new ResponseEntity<>(Flux.fromIterable(albumDTOS),HttpStatus.FOUND))
                 .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(Flux.empty(),HttpStatus.NO_CONTENT)));
+
     }
 
     @Override
@@ -53,10 +55,37 @@ public class AlbumServiceImpl implements IAlbumService {
 
     @Override
     public Mono<ResponseEntity<AlbumDTO>> saveAlbum(AlbumDTO albumDTO) {
-        return null;
+        return this.iAlbumRepository
+                .save(DTOToEntity(albumDTO))
+                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.EXPECTATION_FAILED.toString())))
+                .map(album -> entityToDTO(album))
+                .map(albumDTO1 -> new ResponseEntity<>(albumDTO1,HttpStatus.CREATED))
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.EXPECTATION_FAILED)));
     }
 
+    @Override
+    public Mono<ResponseEntity<AlbumDTO>> updateAlbum(String id, AlbumDTO aDto) {
 
+        return this.iAlbumRepository
+                .findById(id)
+                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
+                .flatMap(album -> {
+                    aDto.setIdAlbum(album.getIdAlbum());
+                    return this.saveAlbum(aDto);
+                })
+                .map(albumDTOResponseEntity -> new ResponseEntity<>(albumDTOResponseEntity.getBody(),HttpStatus.ACCEPTED))
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_MODIFIED)));
+    }
+
+    @Override
+    public Mono<ResponseEntity<Void>> deleteAlbum(String idAlbum) {
+        return this.iAlbumRepository
+                .findById(idAlbum)
+                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
+                .flatMap(album -> this.iAlbumRepository.delete(album).then(Mono.just(new ResponseEntity<Void>(HttpStatus.ACCEPTED))))
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
+
+    }
 
 
     @Override
@@ -68,4 +97,8 @@ public class AlbumServiceImpl implements IAlbumService {
     public AlbumDTO entityToDTO(Album album) {
         return this.modelMapper.map(album,AlbumDTO.class);
     }
+
+
+
+
 }
