@@ -4,6 +4,7 @@ import ec.com.reactive.music.domain.dto.AlbumDTO;
 import ec.com.reactive.music.domain.entities.Album;
 import ec.com.reactive.music.repository.IAlbumRepository;
 import ec.com.reactive.music.service.IAlbumService;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
+@AllArgsConstructor
 public class AlbumServiceImpl implements IAlbumService {
     @Autowired
     private IAlbumRepository iAlbumRepository;
