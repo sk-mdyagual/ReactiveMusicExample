@@ -19,8 +19,6 @@ import reactor.test.StepVerifier;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(MockitoExtension.class)
 class AlbumServiceImplTest {
 
@@ -73,6 +71,7 @@ class AlbumServiceImplTest {
     }
 
     @Test
+    @DisplayName("findAlbumById()")
     void findAlbumById() {
         Album albumExpected = new Album();
         albumExpected.setIdAlbum("12345678-9");
@@ -80,43 +79,121 @@ class AlbumServiceImplTest {
         albumExpected.setArtist("testerArtist");
         albumExpected.setYearRelease(2015);
 
-        var albumDTOExpected = modelMapper.map(albumExpected, AlbumDTO.class);
+        var albumDTOExpected = modelMapper.map(albumExpected,AlbumDTO.class);
 
-        ResponseEntity<AlbumDTO> albumDTOResponseEntity = new ResponseEntity<>(albumDTOExpected,HttpStatus.FOUND);
+        ResponseEntity<AlbumDTO> albumDTOResponse = new ResponseEntity<>(albumDTOExpected,HttpStatus.FOUND);
 
         Mockito.when(albumRepositoryMock.findById(Mockito.any(String.class))).thenReturn(Mono.just(albumExpected));
 
         var service = albumService.findAlbumById("12345678-9");
 
-        StepVerifier.create(service).expectNext(albumDTOResponseEntity).expectComplete().verify();
+        StepVerifier.create(service)
+                .expectNext(albumDTOResponse)
+                .expectComplete()
+                .verify();
 
-        //Mockito.verify(albumRepositoryMock.findById("12345678-9"));
-
+        //Si está utilizando lo que yo mockee
+        Mockito.verify(albumRepositoryMock).findById("12345678-9");
     }
 
     @Test
+    @DisplayName("findAlbumByIdError()")
     void findAlbumByIdError() { //Not found
 
-        ResponseEntity<AlbumDTO> albumDTOResponseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        ResponseEntity<AlbumDTO> albumDTOResponse = new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         Mockito.when(albumRepositoryMock.findById(Mockito.any(String.class))).thenReturn(Mono.empty());
 
         var service = albumService.findAlbumById("12345678-9");
 
-        StepVerifier.create(service).expectNext(albumDTOResponseEntity).expectComplete().verify();
+        StepVerifier.create(service)
+                .expectNext(albumDTOResponse)
+                .expectComplete().verify();
 
-        //Mockito.verify(albumRepositoryMock.findById("12345678-9"));
-
+        Mockito.verify(albumRepositoryMock).findById("12345678-9");
     }
     @Test
-    void saveAlbum() {
+    @DisplayName("saveAlbum()")
+    void saveAlbum(){
+        Album albumExpected = new Album();
+        albumExpected.setIdAlbum("12345678-9");
+        albumExpected.setName("albumTesting1");
+        albumExpected.setArtist("testerArtist");
+        albumExpected.setYearRelease(2015);
+
+        var albumDTOExpected = modelMapper.map(albumExpected,AlbumDTO.class);
+
+        ResponseEntity<AlbumDTO> albumDTOResponse = new ResponseEntity<>(albumDTOExpected,HttpStatus.CREATED);
+
+        Mockito.when(albumRepositoryMock.save(Mockito.any(Album.class))).thenReturn(Mono.just(albumExpected));
+
+        var service = albumService.saveAlbum(albumDTOExpected);
+
+        StepVerifier.create(service)
+                .expectNext(albumDTOResponse)
+                .expectComplete()
+                .verify();
+
+        //Si está utilizando lo que yo mockee
+        Mockito.verify(albumRepositoryMock).save(albumExpected);
     }
 
     @Test
-    void updateAlbum() {
+    @DisplayName("updateAlbum()")
+    void updateAlbum(){
+        Album albumExpected = new Album();
+        albumExpected.setIdAlbum("12345678-9");
+        albumExpected.setName("albumTesting");
+        albumExpected.setArtist("testerArtist");
+        albumExpected.setYearRelease(2015);
+
+        var albumEdited = albumExpected.toBuilder().name("albumTestingEdited").build();
+
+        var albumDTOEdited = modelMapper.map(albumEdited,AlbumDTO.class);
+
+
+        ResponseEntity<AlbumDTO> albumDTOResponse = new ResponseEntity<>(albumDTOEdited,HttpStatus.ACCEPTED);
+
+        //You need to mock the findById first and because you use it previous the save/update
+        Mockito.when(albumRepositoryMock.findById(Mockito.any(String.class))).thenReturn(Mono.just(albumExpected));
+        Mockito.when(albumRepositoryMock.save(Mockito.any(Album.class))).thenReturn(Mono.just(albumEdited));
+
+        var service = albumService.updateAlbum("12345678-9", albumDTOEdited);
+
+        StepVerifier.create(service)
+                .expectNext(albumDTOResponse)
+                .expectComplete()
+                .verify();
+
+        //Si está utilizando lo que yo mockee
+        Mockito.verify(albumRepositoryMock).save(albumEdited);
+
     }
 
     @Test
-    void deleteAlbum() {
+    @DisplayName("deleteAlbum()")
+    void deleteAlbum(){
+        Album albumExpected = new Album();
+        albumExpected.setIdAlbum("12345678-9");
+        albumExpected.setName("albumTesting");
+        albumExpected.setArtist("testerArtist");
+        albumExpected.setYearRelease(2015);
+
+        ResponseEntity<String> responseDelete = new ResponseEntity<>(albumExpected.getIdAlbum(),HttpStatus.ACCEPTED);
+
+        Mockito.when(albumRepositoryMock.findById(Mockito.any(String.class)))
+                .thenReturn(Mono.just(albumExpected));
+        Mockito.when(albumRepositoryMock.deleteById(Mockito.any(String.class)))
+                .thenReturn(Mono.empty());
+
+
+        var service = albumService.deleteAlbum("12345678-9");
+
+
+        StepVerifier.create(service).expectNext(responseDelete).expectComplete().verify();
+
+        Mockito.verify(albumRepositoryMock).findById("12345678-9");
+        Mockito.verify(albumRepositoryMock).deleteById("12345678-9");
+
     }
 }
