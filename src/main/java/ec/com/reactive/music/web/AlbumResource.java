@@ -24,15 +24,26 @@ public class AlbumResource {
         return albumService.findAlbumById(id);
     }
 
+    //POST
     @PostMapping("/saveAlbum")
     private Mono<ResponseEntity<AlbumDTO>> postAlbum(@RequestBody AlbumDTO aDto){
         return albumService.saveAlbum(aDto);
     }
 
+    //PUT
+    @PutMapping("/updateAlbum/{id}")
+    private Mono<ResponseEntity<AlbumDTO>> putAlbum(@PathVariable String id , @RequestBody AlbumDTO aDto){
+        return albumService.updateAlbum(id,aDto);
+    }
 
     //DELETE
     @DeleteMapping("/deleteAlbum/{id}")
     private Mono<ResponseEntity<Void>> deleteAlbum(@PathVariable String id){
         return albumService.deleteAlbum(id);
     }
+
+
+
+
+
 }
