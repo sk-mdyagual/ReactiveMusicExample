@@ -14,7 +14,7 @@ import java.util.UUID;
 @Setter
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class PlaylistDTO {
-    private String idPlaylist= UUID.randomUUID().toString().substring(0, 10);
+    private String idPlaylist;
     private String name;
     private String username;
     private ArrayList<SongDTO> songs;
