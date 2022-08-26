@@ -12,7 +12,7 @@ public interface ISongService {
     Mono<ResponseEntity<SongDTO>> findSongById(String id);
     Mono<ResponseEntity<SongDTO>> saveSong (SongDTO s);
     Mono<ResponseEntity<SongDTO>> updateSong(String idSong, SongDTO sDto);
-    Mono<ResponseEntity<Void>> deleteSong (String idSong);
+    Mono<ResponseEntity<String>> deleteSong (String idSong);
 
     SongDTO entityToDTO(Song s);
     Song dtoToEntity(SongDTO sDto);
