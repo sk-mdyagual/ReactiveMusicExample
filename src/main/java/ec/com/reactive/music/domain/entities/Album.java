@@ -18,7 +18,8 @@ import java.util.UUID;
 @Document(collection = "Album")
 //@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class Album {
-    private String idAlbum = UUID.randomUUID().toString().substring(0, 10);
+    @Id
+    private String idAlbum;
     private String name;
     private String artist;
     private Integer yearRelease;

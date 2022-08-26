@@ -52,7 +52,7 @@ public class AlbumServiceImpl implements IAlbumService {
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString()))) //Capture the error
                 .map(this::entityToDTO)
                 .map(albumDTO -> new ResponseEntity<>(albumDTO, HttpStatus.FOUND)) //Mono<ResponseEntity<AlbumDTO>>
-                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST))); //Handle the error
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_FOUND))); //Handle the error
     }
 
     @Override
@@ -79,12 +79,16 @@ public class AlbumServiceImpl implements IAlbumService {
                 .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_MODIFIED)));
     }
 
+    //I have to change the implementation vs what we did in class because the unit test
     @Override
-    public Mono<ResponseEntity<Void>> deleteAlbum(String idAlbum) {
+    public Mono<ResponseEntity<String>> deleteAlbum(String idAlbum) {
         return this.iAlbumRepository
                 .findById(idAlbum)
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
-                .flatMap(album -> this.iAlbumRepository.delete(album).then(Mono.just(new ResponseEntity<Void>(HttpStatus.ACCEPTED))))
+                .flatMap(album -> this.iAlbumRepository
+                            .deleteById(album.getIdAlbum())
+                            .map(monoVoid -> new ResponseEntity<>(idAlbum, HttpStatus.ACCEPTED)))
+                .thenReturn(new ResponseEntity<>(idAlbum, HttpStatus.ACCEPTED))
                 .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
 
     }
