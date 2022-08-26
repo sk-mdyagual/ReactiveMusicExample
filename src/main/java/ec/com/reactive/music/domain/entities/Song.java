@@ -17,7 +17,7 @@ import java.util.UUID;
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class Song {
     @Id
-    private String idSong= UUID.randomUUID().toString().substring(0, 10);
+    private String idSong;
     private String name;
     private String idAlbum;
     private String lyricsBy;
