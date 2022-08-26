@@ -11,6 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 //@Getter
 //@Setter
+@Builder(toBuilder = true)
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class SongDTO {
     private String idSong;
