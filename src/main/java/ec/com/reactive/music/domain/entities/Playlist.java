@@ -7,19 +7,17 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
-@Getter
 @Document(collection = "Playlist")
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class Playlist {
-    @Id
-    private String idPlaylist;
+    private String idPlaylist = UUID.randomUUID().toString().substring(0, 10);
     private String name;
     private String username;
     private ArrayList<Song> songs;
-    private LocalTime duration;
+    private LocalTime duration = LocalTime.of(0,0,0);
 }

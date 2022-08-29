@@ -10,14 +10,13 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Builder(toBuilder = true)
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class PlaylistDTO {
     private String idPlaylist;
     private String name;
     private String username;
     private ArrayList<SongDTO> songs;
-    private LocalTime duration = LocalTime.of(0,0,0);
+    private LocalTime duration;
 }
 
