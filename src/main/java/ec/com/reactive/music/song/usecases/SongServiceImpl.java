@@ -1,9 +1,9 @@
-package ec.com.reactive.music.service.impl;
+package ec.com.reactive.music.song.usecases;
 
-import ec.com.reactive.music.domain.dto.SongDTO;
-import ec.com.reactive.music.domain.entities.Song;
-import ec.com.reactive.music.repository.ISongRepository;
-import ec.com.reactive.music.service.ISongService;
+import ec.com.reactive.music.song.collections.Song;
+import ec.com.reactive.music.song.dto.SongDTO;
+import ec.com.reactive.music.song.repositories.ISongRepository;
+import ec.com.reactive.music.song.usecases.interfaces.ISongService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,11 +80,11 @@ public class SongServiceImpl implements ISongService {
 
     @Override
     public SongDTO entityToDTO(Song s) {
-        return this.modelMapper.map(s,SongDTO.class);
+        return this.modelMapper.map(s, SongDTO.class);
     }
 
     @Override
     public Song dtoToEntity(SongDTO sDto) {
-        return this.modelMapper.map(sDto,Song.class);
+        return this.modelMapper.map(sDto, Song.class);
     }
 }

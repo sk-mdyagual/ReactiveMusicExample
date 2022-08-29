@@ -1,12 +1,10 @@
-package ec.com.reactive.music.domain.entities;
+package ec.com.reactive.music.album.collection;
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 @Data
@@ -15,6 +13,7 @@ import java.util.UUID;
 @Builder(toBuilder = true)
 @Document(collection = "Album")
 public class Album {
+    @Id
     private String idAlbum = UUID.randomUUID().toString().substring(0, 10);
     private String name;
     private String artist;

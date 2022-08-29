@@ -1,7 +1,7 @@
-package ec.com.reactive.music.service;
+package ec.com.reactive.music.song.usecases.interfaces;
 
-import ec.com.reactive.music.domain.dto.SongDTO;
-import ec.com.reactive.music.domain.entities.Song;
+import ec.com.reactive.music.song.collections.Song;
+import ec.com.reactive.music.song.dto.SongDTO;
 import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

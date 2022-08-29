@@ -1,11 +1,14 @@
-package ec.com.reactive.music.domain.dto;
+package ec.com.reactive.music.playlist.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+import ec.com.reactive.music.song.dto.SongDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor

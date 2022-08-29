@@ -1,17 +1,10 @@
-package ec.com.reactive.music.web;
+package ec.com.reactive.music.playlist.router;
 
-import ec.com.reactive.music.domain.dto.PlaylistDTO;
-import ec.com.reactive.music.service.IPlaylistService;
-import ec.com.reactive.music.service.ISongService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @RestController
 public class PlaylistResource {
-    @Autowired
+    /*@Autowired
     private IPlaylistService playlistService;
 
     @Autowired
@@ -63,6 +56,6 @@ public class PlaylistResource {
     @DeleteMapping("/deletePlaylist/{id}")
     private Mono<ResponseEntity<String>> deletePlaylist(@PathVariable String id){
         return playlistService.deletePlaylist(id);
-    }
+    }*/
 
 }

@@ -1,6 +1,6 @@
-package ec.com.reactive.music.repository;
+package ec.com.reactive.music.song.repositories;
 
-import ec.com.reactive.music.domain.entities.Song;
+import ec.com.reactive.music.song.collections.Song;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.stereotype.Repository;
 
