@@ -12,14 +12,10 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//@Setter
-//@Getter
-@Builder(toBuilder = true) //Clonar objetos
+@Builder(toBuilder = true)
 @Document(collection = "Album")
-//@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class Album {
-    @Id
-    private String idAlbum;
+    private String idAlbum = UUID.randomUUID().toString().substring(0, 10);
     private String name;
     private String artist;
     private Integer yearRelease;

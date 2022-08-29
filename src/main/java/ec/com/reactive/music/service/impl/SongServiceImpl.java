@@ -40,7 +40,7 @@ public class SongServiceImpl implements ISongService {
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
                 .map(this::entityToDTO)
                 .map(songDTO -> new ResponseEntity<>(songDTO,HttpStatus.FOUND))
-                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(HttpStatus.NOT_FOUND)));
+                .onErrorResume(throwable -> Mono.just(new ResponseEntity<>(new SongDTO(),HttpStatus.NOT_FOUND)));
     }
 
     @Override
