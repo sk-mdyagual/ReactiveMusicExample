@@ -9,6 +9,12 @@ import org.springframework.stereotype.Component;
 import java.util.function.Function;
 
 @Component
+/*
+* This class-level annotation treats it as a custom bean.
+* In other words, without having to write any explicit code, Spring will:
+* 1. Scan our application for classes annotated with @Component.
+* 2. Instantiate them and inject any specified dependencies into them.
+* */
 public class AlbumMapper {
     @Autowired
     private ModelMapper modelMapper;
