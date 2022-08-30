@@ -50,12 +50,13 @@ public class AlbumRouter {
                             .applySaveAlbum(albumDTO)
                             //Handle the exception that I dropped on the Mono.errors() inside the usecase
                             //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 55
-                            .onErrorResume(throwable -> Mono.empty()))
+                            //.onErrorResume(throwable -> Mono.empty())) //I'm rewritting the error launched*
                         .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(result))
-                        .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
-        );
+                            //Error always propagates and it will fall here no matter what level there is
+                        .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
+        ));
     }
 
     @Bean
