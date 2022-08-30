@@ -48,13 +48,11 @@ public class AlbumRouter {
                 request -> request.bodyToMono(AlbumDTO.class)
                     .flatMap(albumDTO -> saveAlbumUseCase
                             .applySaveAlbum(albumDTO)
-                            //Handle the exception that I dropped on the Mono.errors() inside the usecase
-                            //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 55
-                            //.onErrorResume(throwable -> Mono.empty())) //I'm rewritting the error launched*
                         .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(result))
                             //Error always propagates and it will fall here no matter what level there is
+                            //Handle the exception that I dropped on the Mono.errors() inside the usecase
                         .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
         ));
     }
@@ -63,12 +61,11 @@ public class AlbumRouter {
     public RouterFunction<ServerResponse> getAlbumById(GetAlbumByIdUseCase getAlbumByIdUseCase){
         return route(GET("/album/{id}"),
                 request -> getAlbumByIdUseCase.apply(request.pathVariable("id"))
-                        //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 68
-                        //.onErrorResume(throwable -> Mono.empty())
-                        //Otherwise, If everything is ok, I will return a properly answer
+                        //If everything is ok, I will return a properly answer
                         .flatMap(albumDTO -> ServerResponse.status(HttpStatus.FOUND)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(albumDTO))
+                        //Error always propagates and it will fall here no matter what level there is
                         .onErrorResume(throwable ->  ServerResponse.notFound().build()));
     }
 
@@ -77,7 +74,6 @@ public class AlbumRouter {
         return route(PUT("/update/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(AlbumDTO.class)
                         .flatMap(albumDTO -> updateAlbumUseCase.applyUpdateAlbum(request.pathVariable("id"),albumDTO)
-                                //.onErrorResume(throwable -> Mono.empty())) //Handling the error in other to activate switchIfEmpty on line 83
                         .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
