@@ -30,10 +30,10 @@ public class GetAlbumsUseCase implements Supplier<Flux<AlbumDTO>> {
     * */
     @Override
     public Flux<AlbumDTO> get() {
-        return albumRepository
+        return this.albumRepository
                 .findAll()
                 .switchIfEmpty(Flux.empty()) //If there is nothing, switch to nothing dude and go to onErrorResume
-                .map(album -> albumMapper.convertEntityToDTO().apply(album)) //Otherwise return the Flux of DTO's albums
-                .onErrorResume(throwable -> Flux.empty()); //Return nothing when drops on switch
+                .map(album -> albumMapper.convertEntityToDTO().apply(album)); //Otherwise return the Flux of DTO's albums
+                //.onErrorResume(throwable -> Flux.empty()); //Return nothing when drops on switch
     }
 }

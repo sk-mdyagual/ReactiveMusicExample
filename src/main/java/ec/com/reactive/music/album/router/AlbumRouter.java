@@ -36,7 +36,7 @@ public class AlbumRouter {
                         //You have to specified which type you are going to return inside the Flux<?>
                         .body(BodyInserters.fromPublisher(getAlbumsUseCase.get(), AlbumDTO.class))
                         //If there is nothing, it falls here with my answer of NO_CONTENT
-                        .switchIfEmpty(ServerResponse.status(HttpStatus.NO_CONTENT).build())
+                        .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NO_CONTENT).build())
 
         );
     }
@@ -64,12 +64,12 @@ public class AlbumRouter {
         return route(GET("/album/{id}"),
                 request -> getAlbumByIdUseCase.apply(request.pathVariable("id"))
                         //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 68
-                        .onErrorResume(throwable -> Mono.empty())
+                        //.onErrorResume(throwable -> Mono.empty())
                         //Otherwise, If everything is ok, I will return a properly answer
                         .flatMap(albumDTO -> ServerResponse.status(HttpStatus.FOUND)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(albumDTO))
-                        .switchIfEmpty(ServerResponse.notFound().build()));
+                        .onErrorResume(throwable ->  ServerResponse.notFound().build()));
     }
 
     @Bean
@@ -77,12 +77,12 @@ public class AlbumRouter {
         return route(PUT("/update/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(AlbumDTO.class)
                         .flatMap(albumDTO -> updateAlbumUseCase.applyUpdateAlbum(request.pathVariable("id"),albumDTO)
-                                .onErrorResume(throwable -> Mono.empty())) //Handling the error in other to activate switchIfEmpty on line 83
+                                //.onErrorResume(throwable -> Mono.empty())) //Handling the error in other to activate switchIfEmpty on line 83
                         .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
-                        .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_MODIFIED)
+                        .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_MODIFIED)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(new AlbumDTO())));
+                                .bodyValue(new AlbumDTO()))));
     }
 }
