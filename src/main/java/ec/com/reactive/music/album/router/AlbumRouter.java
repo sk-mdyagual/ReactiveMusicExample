@@ -1,6 +1,7 @@
 package ec.com.reactive.music.album.router;
 
 import ec.com.reactive.music.album.dto.AlbumDTO;
+import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.album.usecases.GetAlbumsUseCase;
 import ec.com.reactive.music.album.usecases.SaveAlbumUseCase;
 import org.springframework.context.annotation.Bean;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Mono;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -36,15 +38,34 @@ public class AlbumRouter {
 
         );
     }
+    /*UPDATE: Error handling here*/
     @Bean
     public RouterFunction<ServerResponse> saveAlbumRouter(SaveAlbumUseCase saveAlbumUseCase){
         return route(
                 POST("/saveAlbum").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(AlbumDTO.class)
-                    .flatMap(saveAlbumUseCase::applySaveAlbum)
-                    .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
+                    .flatMap(albumDTO -> saveAlbumUseCase
+                            .applySaveAlbum(albumDTO)
+                            //Handle the exception that I dropped on the Mono.errors() inside the usecase
+                            //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 55
+                            .onErrorResume(throwable -> Mono.empty()))
+                        .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
                             .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(result))
+                        .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
         );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> getAlbumById(GetAlbumByIdUseCase getAlbumByIdUseCase){
+        return route(GET("/album/{id}"),
+                request -> getAlbumByIdUseCase.apply(request.pathVariable("id"))
+                        //Keep in mind that I will return a Mono empty which automatically activate the switchIfEmpty on line 68
+                        .onErrorResume(throwable -> Mono.empty())
+                        //Otherwise, If everything is ok, I will return a properly answer
+                        .flatMap(albumDTO -> ServerResponse.status(HttpStatus.FOUND)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(albumDTO))
+                        .switchIfEmpty(ServerResponse.notFound().build()));
     }
 }
