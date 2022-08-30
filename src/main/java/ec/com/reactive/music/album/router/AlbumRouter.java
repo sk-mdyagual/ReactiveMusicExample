@@ -1,9 +1,11 @@
 package ec.com.reactive.music.album.router;
 
+import com.mongodb.internal.connection.Server;
 import ec.com.reactive.music.album.dto.AlbumDTO;
 import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.album.usecases.GetAlbumsUseCase;
 import ec.com.reactive.music.album.usecases.SaveAlbumUseCase;
+import ec.com.reactive.music.album.usecases.UpdateAlbumUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -67,5 +69,19 @@ public class AlbumRouter {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(albumDTO))
                         .switchIfEmpty(ServerResponse.notFound().build()));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> updateAlbum(UpdateAlbumUseCase updateAlbumUseCase){
+        return route(PUT("/update/{id}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(AlbumDTO.class)
+                        .flatMap(albumDTO -> updateAlbumUseCase.applyUpdateAlbum(request.pathVariable("id"),albumDTO)
+                                .onErrorResume(throwable -> Mono.empty())) //Handling the error in other to activate switchIfEmpty on line 83
+                        .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .switchIfEmpty(ServerResponse.status(HttpStatus.NOT_MODIFIED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(new AlbumDTO())));
     }
 }
