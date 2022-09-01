@@ -1,10 +1,7 @@
 package ec.com.reactive.music.song.routers;
 
 import ec.com.reactive.music.song.dto.SongDTO;
-import ec.com.reactive.music.song.usecases.DeleteSongByIdUseCase;
-import ec.com.reactive.music.song.usecases.GetSongByIdUseCase;
-import ec.com.reactive.music.song.usecases.GetSongsByAlbumIdUseCase;
-import ec.com.reactive.music.song.usecases.GetSongsUseCase;
+import ec.com.reactive.music.song.usecases.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -45,6 +42,17 @@ public class SongRouter {
                                 .byAlbumId(request.pathVariable("albumId")), SongDTO.class ))
                         .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).build()));
 
+    }
+
+    @Bean
+    RouterFunction<ServerResponse> saveSongRouter(SaveSongUseCase saveSongUseCase){
+        return route(POST("/saveSong"),
+                request -> request.bodyToMono(SongDTO.class)
+                        .flatMap(songDTO -> saveSongUseCase
+                                .save(songDTO)
+                                .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
+                                        .bodyValue(result))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())));
     }
     @Bean
     RouterFunction<ServerResponse>  deleteSongRouter(DeleteSongByIdUseCase deleSongByIdUseCase){
