@@ -54,6 +54,17 @@ public class SongRouter {
                                         .bodyValue(result))
                                 .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())));
     }
+
+    @Bean
+    RouterFunction<ServerResponse> updateSongRouter(UpdateSongUseCase updateSongUseCase){
+        return route(PUT("/song/update/{id}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(SongDTO.class)
+                        .flatMap(songDTO -> updateSongUseCase.update(request.pathVariable("id"),songDTO))
+                        .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED).build()));
+    }
     @Bean
     RouterFunction<ServerResponse>  deleteSongRouter(DeleteSongByIdUseCase deleSongByIdUseCase){
         return route(DELETE("/deleteSong/{id}").and(accept(MediaType.APPLICATION_JSON)),
