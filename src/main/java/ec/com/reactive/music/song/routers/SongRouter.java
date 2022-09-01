@@ -2,6 +2,7 @@ package ec.com.reactive.music.song.routers;
 
 import ec.com.reactive.music.song.dto.SongDTO;
 import ec.com.reactive.music.song.usecases.DeleteSongByIdUseCase;
+import ec.com.reactive.music.song.usecases.GetSongByIdUseCase;
 import ec.com.reactive.music.song.usecases.GetSongsUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import reactor.core.publisher.Mono;
 
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
@@ -18,6 +18,14 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Configuration
 public class SongRouter {
 
+    @Bean
+    RouterFunction<ServerResponse> getSongById(GetSongByIdUseCase getSongByIdUseCase){
+        return route(GET("/song/{id}"),
+                request -> getSongByIdUseCase.getSongById(request.pathVariable("id"))
+                        .flatMap(songDTO -> ServerResponse.status(HttpStatus.FOUND)
+                                .bodyValue(songDTO))
+                        .onErrorResume(throwable -> ServerResponse.notFound().build()));
+    }
     @Bean
     RouterFunction<ServerResponse> getAllSongsRouter(GetSongsUseCase getSongsUseCase){
         return route(GET("/allSongs"),
