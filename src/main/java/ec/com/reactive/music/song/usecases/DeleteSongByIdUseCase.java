@@ -16,12 +16,12 @@ public class DeleteSongByIdUseCase {
 
     private final GetSongByIdUseCase getSongByIdUseCase;
 
-    private final SongMapper songMapper;
-
 
     public Mono<String> apply(String id) {
         return getSongByIdUseCase.getSongById(id)
-                .flatMap(songDTO -> this.songRepository.delete(songMapper.convertDTOToEntity().apply(songDTO)))
-                .map(result -> id);
+                .map(songDTO -> {
+                    songRepository.deleteById(songDTO.getIdSong());
+                    return songDTO.getIdSong();
+                });
     }
 }
