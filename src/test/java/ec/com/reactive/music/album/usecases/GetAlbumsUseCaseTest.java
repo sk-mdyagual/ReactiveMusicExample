@@ -15,6 +15,8 @@ import org.modelmapper.ModelMapper;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.util.Objects;
+
 @ExtendWith(MockitoExtension.class)
 class GetAlbumsUseCaseTest {
     @Mock
@@ -32,17 +34,18 @@ class GetAlbumsUseCaseTest {
     @Test
     @DisplayName("getAlbumsUseCase()")
     void getAlbumsUseCaseTest(){
-        Flux<Album> albumsExpected = Flux.just(new Album(),new Album());
+        Flux<Album> albumsExpected = Flux.just(new Album("12345-6","nameTest","artistTest",2000),
+                new Album("12345-7","nameTest","artistTest",2000));
 
-        Mockito.when(albumRepositoryMock.findAll()).thenReturn(albumsExpected);
+        Flux<Album> albumsExpected2 = Flux.just(new Album(),new Album());
+
+        Mockito.when(albumRepositoryMock.findAll()).thenReturn(albumsExpected2);
 
         var useCaseExecute = useCase.get();
 
         StepVerifier.create(useCaseExecute)
-                .expectNextMatches(albumDTO -> albumDTO instanceof AlbumDTO)
-                .expectNextCount(1)
-                .expectComplete()
-                .verify();
+                .expectNextMatches(Objects::nonNull)
+                        .expectNextCount(1).verifyComplete();
 
         Mockito.verify(albumRepositoryMock).findAll();
 
