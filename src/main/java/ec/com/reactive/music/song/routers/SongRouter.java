@@ -18,7 +18,7 @@ public class SongRouter {
 
     @Bean
     RouterFunction<ServerResponse> getAllSongsRouter(GetSongsUseCase getSongsUseCase){
-        return route(GET("/allSongs"),
+        return route(GET("/songs"),
                 request -> ServerResponse.status(HttpStatus.FOUND)
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(getSongsUseCase.getAllSongs(), SongDTO.class))
@@ -46,7 +46,7 @@ public class SongRouter {
 
     @Bean
     RouterFunction<ServerResponse> saveSongRouter(SaveSongUseCase saveSongUseCase){
-        return route(POST("/saveSong"),
+        return route(POST("/song/save"),
                 request -> request.bodyToMono(SongDTO.class)
                         .flatMap(songDTO -> saveSongUseCase
                                 .save(songDTO)
@@ -67,7 +67,7 @@ public class SongRouter {
     }
     @Bean
     RouterFunction<ServerResponse>  deleteSongRouter(DeleteSongByIdUseCase deleSongByIdUseCase){
-        return route(DELETE("/deleteSong/{id}").and(accept(MediaType.APPLICATION_JSON)),
+        return route(DELETE("/song/delete/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> deleSongByIdUseCase.apply(request.pathVariable("id"))
                         .flatMap(s -> ServerResponse.status(HttpStatus.ACCEPTED)
                                 .contentType(MediaType.APPLICATION_JSON)
