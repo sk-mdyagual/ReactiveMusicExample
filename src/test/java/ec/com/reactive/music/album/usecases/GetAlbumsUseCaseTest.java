@@ -34,9 +34,6 @@ class GetAlbumsUseCaseTest {
     @Test
     @DisplayName("getAlbumsUseCase()")
     void getAlbumsUseCaseTest(){
-        Flux<Album> albumsExpected = Flux.just(new Album("12345-6","nameTest","artistTest",2000),
-                new Album("12345-7","nameTest","artistTest",2000));
-
         Flux<Album> albumsExpected2 = Flux.just(new Album(),new Album());
 
         Mockito.when(albumRepositoryMock.findAll()).thenReturn(albumsExpected2);
@@ -50,7 +47,5 @@ class GetAlbumsUseCaseTest {
         Mockito.verify(albumRepositoryMock).findAll();
 
     }
-
-
 
 }
