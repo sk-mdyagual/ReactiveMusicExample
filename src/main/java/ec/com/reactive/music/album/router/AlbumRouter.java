@@ -79,6 +79,6 @@ public class AlbumRouter {
                                 .bodyValue(result))
                         .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_MODIFIED)
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(new AlbumDTO()))));
+                                .build())));
     }
 }
