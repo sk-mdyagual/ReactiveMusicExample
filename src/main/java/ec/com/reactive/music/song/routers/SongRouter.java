@@ -19,10 +19,9 @@ public class SongRouter {
     RouterFunction<ServerResponse>  deleteSongRouter(DeleteSongByIdUseCase deleSongByIdUseCase){
         return route(DELETE("/deleteSong/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> deleSongByIdUseCase.apply(request.pathVariable("id"))
-                        .onErrorResume(throwable -> Mono.empty())
                         .flatMap(s -> ServerResponse.status(HttpStatus.ACCEPTED)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(s))
-                        .switchIfEmpty(ServerResponse.notFound().build()));
+                        .onErrorResume(throwable ->  ServerResponse.notFound().build()));
     }
 }
