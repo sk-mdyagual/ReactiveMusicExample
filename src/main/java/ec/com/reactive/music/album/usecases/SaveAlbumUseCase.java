@@ -4,6 +4,7 @@ import ec.com.reactive.music.album.dto.AlbumDTO;
 import ec.com.reactive.music.album.repository.IAlbumRepository;
 import ec.com.reactive.music.album.usecases.interfaces.SaveAlbum;
 import ec.com.reactive.music.album.mapper.AlbumMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -12,13 +13,12 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class SaveAlbumUseCase implements SaveAlbum {
 
-    @Autowired
-    private IAlbumRepository albumRepository;
+    private final IAlbumRepository albumRepository;
 
-    @Autowired
-    private AlbumMapper albumMapper;
+    private final AlbumMapper albumMapper;
 
     /*I update it in order to manage scenarios when we sent an empty AlbumDTO object or some of the attributes is null
     * Using the ternary operator I split both cases. On the router, I will manage the catch of the exception dropped by
