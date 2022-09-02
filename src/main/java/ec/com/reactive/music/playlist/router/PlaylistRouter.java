@@ -1,10 +1,7 @@
 package ec.com.reactive.music.playlist.router;
 
 import ec.com.reactive.music.playlist.dto.PlaylistDTO;
-import ec.com.reactive.music.playlist.usecases.GetPlaylistByIdUseCase;
-import ec.com.reactive.music.playlist.usecases.GetPlaylistsUseCase;
-import ec.com.reactive.music.playlist.usecases.SavePlaylistUseCase;
-import ec.com.reactive.music.playlist.usecases.UpdatePlaylistUseCase;
+import ec.com.reactive.music.playlist.usecases.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -59,5 +56,15 @@ public class PlaylistRouter {
                                 .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .build())));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> deletePlaylistRouter(DeletePlaylistUseCase deletePlaylistUseCase){
+        return route(DELETE("/playlist/delete/{playlistId}"),
+                request -> deletePlaylistUseCase.applyUseCase(request.pathVariable("playlistId"))
+                        .flatMap(result -> ServerResponse.accepted()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.notFound().build()));
     }
 }
