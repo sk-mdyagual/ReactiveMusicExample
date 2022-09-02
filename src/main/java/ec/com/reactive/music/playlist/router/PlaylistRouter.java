@@ -4,6 +4,7 @@ import ec.com.reactive.music.playlist.dto.PlaylistDTO;
 import ec.com.reactive.music.playlist.usecases.GetPlaylistByIdUseCase;
 import ec.com.reactive.music.playlist.usecases.GetPlaylistsUseCase;
 import ec.com.reactive.music.playlist.usecases.SavePlaylistUseCase;
+import ec.com.reactive.music.playlist.usecases.UpdatePlaylistUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+import static org.springframework.web.bind.annotation.RequestMethod.PUT;
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -43,7 +45,19 @@ public class PlaylistRouter {
                                 .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result))
-                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
-                        ));
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> updatePlaylistRouter(UpdatePlaylistUseCase updatePlaylistUseCase){
+        return route(PUT("/playlist/update/{playlistId}").and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(PlaylistDTO.class)
+                        .flatMap(playlistDTO -> updatePlaylistUseCase.applyUseCase(request.pathVariable("playlistId"),playlistDTO)
+                                .flatMap(result -> ServerResponse.accepted()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .build())));
     }
 }
