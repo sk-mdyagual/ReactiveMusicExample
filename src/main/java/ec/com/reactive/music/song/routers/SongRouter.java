@@ -1,5 +1,6 @@
 package ec.com.reactive.music.song.routers;
 
+import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.song.dto.SongDTO;
 import ec.com.reactive.music.song.usecases.*;
 import org.springframework.context.annotation.Bean;
@@ -18,8 +19,8 @@ public class SongRouter {
 
     @Bean
     RouterFunction<ServerResponse> getAllSongsRouter(GetSongsUseCase getSongsUseCase){
-        return route(GET("/songs"),
-                request -> ServerResponse.status(HttpStatus.FOUND)
+        return route(GET("/song/all"),
+                request -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(BodyInserters.fromPublisher(getSongsUseCase.getAllSongs(), SongDTO.class))
                         .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NO_CONTENT).build()));
@@ -45,14 +46,14 @@ public class SongRouter {
     }
 
     @Bean
-    RouterFunction<ServerResponse> saveSongRouter(SaveSongUseCase saveSongUseCase){
+    RouterFunction<ServerResponse> saveSongRouter(GetAlbumByIdUseCase getAlbumByIdUseCase,SaveSongUseCase saveSongUseCase){
         return route(POST("/song/save"),
                 request -> request.bodyToMono(SongDTO.class)
-                        .flatMap(songDTO -> saveSongUseCase
-                                .save(songDTO)
-                                .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
-                                        .bodyValue(result))
-                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())));
+                        .flatMap(songDTO -> getAlbumByIdUseCase.apply(songDTO.getIdAlbum())
+                                        .flatMap(albumDTO -> saveSongUseCase.save(songDTO)
+                                                .flatMap(result -> ServerResponse.status(HttpStatus.CREATED).bodyValue(result)))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build()))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).build()));
     }
 
     @Bean
