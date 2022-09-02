@@ -11,8 +11,6 @@ import java.time.LocalTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-//@Getter
-//@Setter
 @Builder(toBuilder = true)
 @JsonFormat(shape=JsonFormat.Shape.STRING, pattern="HH:mm:ss")
 public class SongDTO {
