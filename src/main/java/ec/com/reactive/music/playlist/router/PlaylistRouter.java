@@ -2,6 +2,7 @@ package ec.com.reactive.music.playlist.router;
 
 import ec.com.reactive.music.playlist.dto.PlaylistDTO;
 import ec.com.reactive.music.playlist.usecases.*;
+import ec.com.reactive.music.song.usecases.GetSongByIdUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -65,6 +66,18 @@ public class PlaylistRouter {
                         .flatMap(result -> ServerResponse.accepted()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.notFound().build()));
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> addSongToPlaylist(AddSongUseCase addSongUseCase, GetSongByIdUseCase getSongByIdUseCase){
+        return route(PUT("/playlist/add/{playlistId}/{songId}"),
+                request -> getSongByIdUseCase.getSongById(request.pathVariable("songId"))
+                        .flatMap(songDTO -> addSongUseCase.addToPlaylist(request.pathVariable("plalistId"),songDTO )
+                                .flatMap(playlistDTO -> ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(playlistDTO))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED).build()))
                         .onErrorResume(throwable -> ServerResponse.notFound().build()));
     }
 }

@@ -21,5 +21,13 @@ public class PlaylistDTO {
     private String username;
     private ArrayList<SongDTO> songs;
     private LocalTime duration;
+
+    public static LocalTime addDuration(LocalTime playlistDuration, LocalTime songDuration){
+        return playlistDuration.plusHours(songDuration.getHour()).plusMinutes(songDuration.getMinute()).plusSeconds(songDuration.getSecond());
+    }
+
+    public static LocalTime removeDuration(LocalTime playlistDuration, LocalTime songDuration){
+        return playlistDuration.minusHours(songDuration.getHour()).minusMinutes(songDuration.getMinute()).minusSeconds(songDuration.getSecond());
+    }
 }
 
