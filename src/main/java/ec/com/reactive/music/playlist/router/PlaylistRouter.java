@@ -1,6 +1,7 @@
 package ec.com.reactive.music.playlist.router;
 
 import ec.com.reactive.music.playlist.dto.PlaylistDTO;
+import ec.com.reactive.music.playlist.usecases.GetPlaylistByIdUseCase;
 import ec.com.reactive.music.playlist.usecases.GetPlaylistsUseCase;
 import ec.com.reactive.music.playlist.usecases.SavePlaylistUseCase;
 import org.springframework.context.annotation.Bean;
@@ -26,8 +27,17 @@ public class PlaylistRouter {
     }
 
     @Bean
+    RouterFunction<ServerResponse> getPlaylistByIdRouter(GetPlaylistByIdUseCase getPlaylistByIdUseCase){
+        return route(GET("/playlist/{playlistId}"),
+                request -> getPlaylistByIdUseCase.getPlaylist(request.pathVariable("playlisId"))
+                        .flatMap(playlistDTO -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(playlistDTO))
+                        .onErrorResume(throwable -> ServerResponse.notFound().build()));
+    }
+    @Bean
     RouterFunction<ServerResponse> savePlaylistRouter(SavePlaylistUseCase savePlaylistUseCase){
-        return route(POST("/save/playlist").and(accept(MediaType.APPLICATION_JSON)),
+        return route(POST("/playlist/save").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(PlaylistDTO.class)
                         .flatMap(playlistDTO -> savePlaylistUseCase.applyUseCase(playlistDTO)
                                 .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
