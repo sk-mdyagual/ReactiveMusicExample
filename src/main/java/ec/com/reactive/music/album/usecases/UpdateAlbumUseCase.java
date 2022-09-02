@@ -29,21 +29,7 @@ public class UpdateAlbumUseCase implements UpdateAlbum {
      * Using the ternary operator I split both cases. On the router, I will manage the catch of the exception dropped by
      * switchIfEmpty also the Mono.errors(). Remember: I will treat the Mono.error on the router. If I forgot it the usecase will fail*/
     @Override
-    public Mono<AlbumDTO> applyUpdateAlbum(String albumId,AlbumDTO albumDTO) {
-        //Refactor
-        /*return !Objects.isNull(albumDTO) ? //A static method in final class Objects that allows to check if albumDTO is null
-                        !AlbumDTO.thereIsNullAttributes().test(albumDTO) ? //This is a predicate, I create it on AlbumDTO class
-                        this.albumRepository
-                                .findById(id)
-                                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
-                                .flatMap(album -> {
-                                    albumDTO.setIdAlbum(album.getIdAlbum());
-                                    return saveAlbumUseCase.applySaveAlbum(albumDTO);
-                                })//.map(album -> albumMapper.convertEntityToDTO().apply(album))
-                                .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_ACCEPTABLE.toString())))
-                        : Mono.error(new Throwable(HttpStatus.NOT_ACCEPTABLE.toString()))
-                : Mono.error(new Throwable(HttpStatus.NOT_ACCEPTABLE.toString()));*/
-
+    public Mono<AlbumDTO> applyUpdateAlbum(@PathVariable String albumId, @RequestBody AlbumDTO albumDTO) {
         return getAlbumByIdUseCase
                 .apply(albumId)
                 .flatMap(albumDTOFound -> {

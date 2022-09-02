@@ -4,6 +4,7 @@ import ec.com.reactive.music.album.dto.AlbumDTO;
 import ec.com.reactive.music.album.repository.IAlbumRepository;
 import ec.com.reactive.music.album.usecases.interfaces.SaveAlbum;
 import ec.com.reactive.music.album.mapper.AlbumMapper;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class SaveAlbumUseCase implements SaveAlbum {
     * Using the ternary operator I split both cases. On the router, I will manage the catch of the exception dropped by
     * switchIfEmpty also the Mono.errors()*/
     @Override
-    public Mono<AlbumDTO> applySaveAlbum(AlbumDTO albumDTO) {
+    public Mono<AlbumDTO> applySaveAlbum(@RequestBody AlbumDTO albumDTO) {
         return !Objects.isNull(albumDTO)? //A static method in final class Objects that allows to check if albumDTO is null
                 !AlbumDTO.thereIsNullAttributes().test(albumDTO) ? //This is a predicate, I create it on AlbumDTO class
                 this.albumRepository

@@ -5,10 +5,17 @@ import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.album.usecases.GetAlbumsUseCase;
 import ec.com.reactive.music.album.usecases.SaveAlbumUseCase;
 import ec.com.reactive.music.album.usecases.UpdateAlbumUseCase;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import org.springdoc.core.annotations.RouterOperation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
@@ -23,6 +30,13 @@ In simple words, The @RestController annotation becames @Configuration for the f
 @Configuration
 public class AlbumRouter {
     @Bean //<-- A bean is a method-level annotation which simply a Java object which is created by Spring framework
+    @RouterOperation(path = "/album/all", produces = {
+            MediaType.APPLICATION_JSON_VALUE},
+            beanClass = GetAlbumsUseCase.class, method = RequestMethod.GET, beanMethod = "get",
+            operation = @Operation(operationId = "getAllAlbums", tags = "Album usecases", responses = {
+                    @ApiResponse(responseCode = "200", description = "Success",
+                            content = @Content(schema = @Schema(implementation = AlbumDTO.class))),
+                    @ApiResponse(responseCode = "204", description = "Nothing to show")}))
     public RouterFunction<ServerResponse> getAlbumsRouter(GetAlbumsUseCase getAlbumsUseCase){
         return route(GET("/album/all"), //Define the endpoint to be consumed
                 //Keep in mind that you will retrieve a flux of AlbumDTO's
@@ -40,6 +54,13 @@ public class AlbumRouter {
         );
     }
     @Bean
+    @RouterOperation(path = "/album/{albumId}", produces = {
+            MediaType.APPLICATION_JSON_VALUE},
+            beanClass = GetAlbumByIdUseCase.class, method = RequestMethod.GET, beanMethod = "apply",
+            operation = @Operation(operationId = "getAlbumById", tags = "Album usecases", responses = {
+                    @ApiResponse(responseCode = "200", description = "Album found",
+                            content = @Content(schema = @Schema(implementation = AlbumDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Album not found")}))
     public RouterFunction<ServerResponse> getAlbumById(GetAlbumByIdUseCase getAlbumByIdUseCase){
         return route(GET("/album/{albumId}"),
                 request -> getAlbumByIdUseCase.apply(request.pathVariable("albumId"))
@@ -59,33 +80,45 @@ public class AlbumRouter {
 
     /*UPDATE: Error handling here*/
     @Bean
+    @RouterOperation(path = "/album/save", produces = {
+            MediaType.APPLICATION_JSON_VALUE}, beanClass = SaveAlbumUseCase.class, method = RequestMethod.POST, beanMethod = "applySaveAlbum",
+            operation = @Operation(operationId = "saveAlbum", tags = "Album usecases",
+                    responses = {@ApiResponse(responseCode = "201", description = "Success", content = @Content(schema = @Schema(implementation = AlbumDTO.class))),
+                            @ApiResponse(responseCode = "406", description = "Not acceptable. Try again")},
+                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = AlbumDTO.class)))))
     public RouterFunction<ServerResponse> saveAlbumRouter(SaveAlbumUseCase saveAlbumUseCase){
         return route(
                 POST("/album/save").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(AlbumDTO.class)
-                    .flatMap(albumDTO -> saveAlbumUseCase
-                            .applySaveAlbum(albumDTO)
-                        .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .bodyValue(result))
-                            //Error always propagates and it will fall here no matter what level there is
-                            //Handle the exception that I dropped on the Mono.errors() inside the usecase
-                        .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
-        ));
+                        .flatMap(albumDTO -> saveAlbumUseCase
+                                .applySaveAlbum(albumDTO)
+                                .flatMap(result -> ServerResponse.status(HttpStatus.CREATED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result))
+                                //Error always propagates and it will fall here no matter what level there is
+                                //Handle the exception that I dropped on the Mono.errors() inside the usecase
+                                .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_ACCEPTABLE).build())
+                        ));
     }
 
 
 
     @Bean
+    @RouterOperation(path = "/album/update/{albumId}", produces = {
+            MediaType.APPLICATION_JSON_VALUE}, beanClass = UpdateAlbumUseCase.class, method = RequestMethod.PUT, beanMethod = "applyUpdateAlbum",
+            operation = @Operation(operationId = "updateAlbum", tags = "Album usecases",
+                    responses = {@ApiResponse(responseCode = "202", description = "Accepted", content = @Content(schema = @Schema(implementation = AlbumDTO.class))),
+                            @ApiResponse(responseCode = "406", description = "Not acceptable. Try again")},
+                    requestBody = @RequestBody(content = @Content(schema = @Schema(implementation = AlbumDTO.class)))))
     public RouterFunction<ServerResponse> updateAlbum(UpdateAlbumUseCase updateAlbumUseCase){
         return route(PUT("/album/update/{id}").and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToMono(AlbumDTO.class)
                         .flatMap(albumDTO -> updateAlbumUseCase.applyUpdateAlbum(request.pathVariable("albumId"),albumDTO)
-                        .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .bodyValue(result))
-                        .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_MODIFIED)
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .build())));
+                                .flatMap(result -> ServerResponse.status(HttpStatus.ACCEPTED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(result))
+                                .onErrorResume(throwable ->  ServerResponse.status(HttpStatus.NOT_MODIFIED)
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .build())));
     }
 }

@@ -7,6 +7,7 @@ import ec.com.reactive.music.album.repository.IAlbumRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 import java.util.function.Function;
@@ -27,7 +28,7 @@ public class GetAlbumByIdUseCase implements Function<String, Mono<AlbumDTO>>{
     /*From now we will treat the Mono.error() on the respective route in AlbumRouter. So, let focus only in
     * launch then alongside with the switchIfEmpty()*/
     @Override
-    public Mono<AlbumDTO> apply(String albumId) {
+    public Mono<AlbumDTO> apply(@PathVariable String albumId) {
         return albumRepository
                 .findById(albumId)
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
