@@ -15,9 +15,9 @@ public class GetSongByIdUseCase {
     private final ISongRepository songRepository;
     private final SongMapper songMapper;
 
-    public Mono<SongDTO> getSongById(String id){
+    public Mono<SongDTO> getSongById(String songId){
         return this.songRepository
-                .findById(id)
+                .findById(songId)
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))
                 .map(song -> songMapper.convertEntityToDTO().apply(song));
     }

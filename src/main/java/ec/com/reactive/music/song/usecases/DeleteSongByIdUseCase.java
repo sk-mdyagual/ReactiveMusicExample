@@ -17,8 +17,8 @@ public class DeleteSongByIdUseCase {
     private final GetSongByIdUseCase getSongByIdUseCase;
 
 
-    public Mono<String> apply(String id) {
-        return getSongByIdUseCase.getSongById(id)
+    public Mono<String> apply(String songId) {
+        return getSongByIdUseCase.getSongById(songId)
                 .map(songDTO -> {
                     songRepository.deleteById(songDTO.getIdSong());
                     return songDTO.getIdSong();

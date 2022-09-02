@@ -13,8 +13,8 @@ public class UpdateSongUseCase {
     private final SaveSongUseCase saveSongUseCase;
     private final GetSongByIdUseCase getSongByIdUseCase;
 
-    public Mono<SongDTO> update(String id, SongDTO songDTO){
-        return getSongByIdUseCase.getSongById(id)
+    public Mono<SongDTO> update(String songId, SongDTO songDTO){
+        return getSongByIdUseCase.getSongById(songId)
                 .flatMap(songDTOFound -> {
                     Objects.requireNonNull(songDTO).setIdSong(songDTOFound.getIdSong());
                     return saveSongUseCase.save(songDTO);
