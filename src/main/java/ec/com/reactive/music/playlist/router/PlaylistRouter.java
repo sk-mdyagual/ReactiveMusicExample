@@ -80,4 +80,16 @@ public class PlaylistRouter {
                                 .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED).build()))
                         .onErrorResume(throwable -> ServerResponse.notFound().build()));
     }
+
+    @Bean
+    public RouterFunction<ServerResponse> removeSongFromPlaylist(RemoveSongUseCase removeSongUseCase, GetSongByIdUseCase getSongByIdUseCase){
+        return route(PUT("/playlist/add/{playlistId}/{songId}"),
+                request -> getSongByIdUseCase.getSongById(request.pathVariable("songId"))
+                        .flatMap(songDTO -> removeSongUseCase.removeFromPlaylist(request.pathVariable("playlistId"),songDTO )
+                                .flatMap(playlistDTO -> ServerResponse.ok()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .bodyValue(playlistDTO))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_MODIFIED).build()))
+                        .onErrorResume(throwable -> ServerResponse.notFound().build()));
+    }
 }
