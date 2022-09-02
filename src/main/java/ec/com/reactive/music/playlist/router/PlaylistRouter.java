@@ -73,7 +73,7 @@ public class PlaylistRouter {
     public RouterFunction<ServerResponse> addSongToPlaylist(AddSongUseCase addSongUseCase, GetSongByIdUseCase getSongByIdUseCase){
         return route(PUT("/playlist/add/{playlistId}/{songId}"),
                 request -> getSongByIdUseCase.getSongById(request.pathVariable("songId"))
-                        .flatMap(songDTO -> addSongUseCase.addToPlaylist(request.pathVariable("plalistId"),songDTO )
+                        .flatMap(songDTO -> addSongUseCase.addToPlaylist(request.pathVariable("playlistId"),songDTO )
                                 .flatMap(playlistDTO -> ServerResponse.ok()
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(playlistDTO))
