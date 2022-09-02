@@ -1,13 +1,11 @@
 package ec.com.reactive.music.album.usecases;
 
 import ec.com.reactive.music.album.dto.AlbumDTO;
-import ec.com.reactive.music.album.mapper.AlbumMapper;
-import ec.com.reactive.music.album.repository.IAlbumRepository;
 import ec.com.reactive.music.album.usecases.interfaces.UpdateAlbum;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -31,7 +29,7 @@ public class UpdateAlbumUseCase implements UpdateAlbum {
      * Using the ternary operator I split both cases. On the router, I will manage the catch of the exception dropped by
      * switchIfEmpty also the Mono.errors(). Remember: I will treat the Mono.error on the router. If I forgot it the usecase will fail*/
     @Override
-    public Mono<AlbumDTO> applyUpdateAlbum(String id, AlbumDTO albumDTO) {
+    public Mono<AlbumDTO> applyUpdateAlbum(String albumId,AlbumDTO albumDTO) {
         //Refactor
         /*return !Objects.isNull(albumDTO) ? //A static method in final class Objects that allows to check if albumDTO is null
                         !AlbumDTO.thereIsNullAttributes().test(albumDTO) ? //This is a predicate, I create it on AlbumDTO class
@@ -47,7 +45,7 @@ public class UpdateAlbumUseCase implements UpdateAlbum {
                 : Mono.error(new Throwable(HttpStatus.NOT_ACCEPTABLE.toString()));*/
 
         return getAlbumByIdUseCase
-                .apply(id)
+                .apply(albumId)
                 .flatMap(albumDTOFound -> {
                     Objects.requireNonNull(albumDTO).setIdAlbum(albumDTOFound.getIdAlbum());
                     return saveAlbumUseCase.applySaveAlbum(albumDTO);

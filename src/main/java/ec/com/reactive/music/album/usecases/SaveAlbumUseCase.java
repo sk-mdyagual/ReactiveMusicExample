@@ -5,7 +5,6 @@ import ec.com.reactive.music.album.repository.IAlbumRepository;
 import ec.com.reactive.music.album.usecases.interfaces.SaveAlbum;
 import ec.com.reactive.music.album.mapper.AlbumMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
