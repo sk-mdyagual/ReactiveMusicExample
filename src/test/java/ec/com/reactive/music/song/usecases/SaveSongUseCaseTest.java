@@ -1,5 +1,7 @@
 package ec.com.reactive.music.song.usecases;
 
+import ec.com.reactive.music.album.dto.AlbumDTO;
+import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.song.collections.Song;
 import ec.com.reactive.music.song.dto.SongDTO;
 import ec.com.reactive.music.song.mapper.SongMapper;
@@ -23,21 +25,27 @@ import static org.junit.jupiter.api.Assertions.*;
 class SaveSongUseCaseTest {
     @Mock
     ISongRepository songRepositoryMock;
+
+    @Mock
+    GetAlbumByIdUseCase useCaseAlbumById;
+
     SongMapper songMapper;
     SaveSongUseCase useCase;
 
     @BeforeEach
     void init(){
         songMapper = new SongMapper(new ModelMapper());
-        useCase = new SaveSongUseCase(songRepositoryMock,songMapper);
+        useCase = new SaveSongUseCase(songRepositoryMock,useCaseAlbumById,songMapper);
     }
 
     @Test
     @DisplayName("saveSongUseCase()")
     void save() {
+        var albumFounded = new AlbumDTO("1234-5","albumTest","artistTest",2020);
         var songToSave = new SongDTO(null,"songTest","1234-5","lyricsTest","producedTest","arrangeTest", LocalTime.of(0,3,45));
         var songSaved = songToSave.toBuilder().idSong("321-5").build();
 
+        Mockito.when(useCaseAlbumById.apply(Mockito.any(String.class))).thenReturn(Mono.just(albumFounded));
         Mockito.when(songRepositoryMock.save(Mockito.any(Song.class))).thenReturn(Mono.just(songMapper.convertDTOToEntity().apply(songSaved)));
 
         var useCaseExecute=useCase.save(songToSave);
@@ -46,6 +54,7 @@ class SaveSongUseCaseTest {
                 .expectNext(songSaved)
                 .verifyComplete();
 
+        Mockito.verify(useCaseAlbumById).apply(Mockito.any(String.class));
         Mockito.verify(songRepositoryMock).save(Mockito.any(Song.class));
     }
 }
