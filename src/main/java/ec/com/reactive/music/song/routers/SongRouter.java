@@ -1,6 +1,5 @@
 package ec.com.reactive.music.song.routers;
 
-import ec.com.reactive.music.album.usecases.GetAlbumByIdUseCase;
 import ec.com.reactive.music.song.dto.SongDTO;
 import ec.com.reactive.music.song.usecases.*;
 import io.swagger.v3.oas.annotations.Operation;
@@ -79,7 +78,7 @@ public class SongRouter {
             operation = @Operation(operationId = "saveSongRouter", tags = "Song usecases", responses = {
                     @ApiResponse(responseCode = "201", description = "Success",
                             content = @Content(schema = @Schema(implementation = SongDTO.class))),
-                    @ApiResponse(responseCode = "406",description = "Not acceptable, maybe Album not Found to proceed or something else")}))
+                    @ApiResponse(responseCode = "406",description = "Not acceptable, maybe Song not Found to proceed or something else")}))
     RouterFunction<ServerResponse> saveSongRouter(SaveSongUseCase saveSongUseCase){
         return route(POST("/song/save"),
                 request -> request.bodyToMono(SongDTO.class)
