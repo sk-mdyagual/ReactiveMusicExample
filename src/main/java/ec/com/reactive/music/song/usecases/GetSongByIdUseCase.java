@@ -6,6 +6,7 @@ import ec.com.reactive.music.song.repositories.ISongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 //Making the usecase with no Functional interface to show that it is not needed
@@ -15,7 +16,7 @@ public class GetSongByIdUseCase {
     private final ISongRepository songRepository;
     private final SongMapper songMapper;
 
-    public Mono<SongDTO> getSongById(String songId){
+    public Mono<SongDTO> getSongById(@PathVariable String songId){
         return this.songRepository
                 .findById(songId)
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))

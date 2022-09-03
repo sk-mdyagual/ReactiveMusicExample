@@ -6,6 +6,7 @@ import ec.com.reactive.music.song.dto.SongDTO;
 import ec.com.reactive.music.song.repositories.ISongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Flux;
 
 @Service
@@ -14,7 +15,7 @@ public class GetSongsByAlbumIdUseCase {
     public final GetAlbumByIdUseCase getAlbumByIdUseCase;
     public final GetSongsUseCase getSongsUseCase;
 
-    public Flux<SongDTO> byAlbumId(String albumId){
+    public Flux<SongDTO> byAlbumId(@PathVariable String albumId){
         return getAlbumByIdUseCase.apply(albumId)
                 .flatMapMany(albumDTO -> getSongsUseCase
                         .getAllSongs()

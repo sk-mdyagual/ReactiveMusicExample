@@ -4,6 +4,7 @@ import ec.com.reactive.music.song.mapper.SongMapper;
 import ec.com.reactive.music.song.repositories.ISongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 /*In order to check a deleteUseCase I did it for Song entity
@@ -17,7 +18,7 @@ public class DeleteSongByIdUseCase {
     private final GetSongByIdUseCase getSongByIdUseCase;
 
 
-    public Mono<String> apply(String songId) {
+    public Mono<String> apply(@PathVariable String songId) {
         return getSongByIdUseCase.getSongById(songId)
                 .map(songDTO -> {
                     songRepository.deleteById(songDTO.getIdSong());
