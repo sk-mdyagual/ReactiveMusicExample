@@ -6,6 +6,8 @@ import ec.com.reactive.music.playlist.usecases.interfaces.SavePlaylist;
 import ec.com.reactive.music.playlist.usecases.interfaces.UpdatePlaylist;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -17,7 +19,7 @@ public class UpdatePlaylistUseCase implements UpdatePlaylist {
     private final SavePlaylistUseCase savePlaylistUseCase;
 
     @Override
-    public Mono<PlaylistDTO> applyUseCase(String playlistId, PlaylistDTO playlistDTO) {
+    public Mono<PlaylistDTO> applyUseCase(@PathVariable String playlistId, @RequestBody PlaylistDTO playlistDTO) {
         return this.getPlaylistById
                 .getPlaylist(playlistId)
                 .flatMap(playlistDTO1 -> {

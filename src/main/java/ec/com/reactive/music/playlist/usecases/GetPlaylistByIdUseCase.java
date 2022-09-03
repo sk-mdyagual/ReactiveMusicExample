@@ -7,6 +7,7 @@ import ec.com.reactive.music.playlist.usecases.interfaces.GetPlaylistById;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -18,7 +19,7 @@ public class GetPlaylistByIdUseCase implements GetPlaylistById {
 
 
     @Override
-    public Mono<PlaylistDTO> getPlaylist(String playlistId) {
+    public Mono<PlaylistDTO> getPlaylist(@PathVariable String playlistId) {
         return this.playlistRepository
                 .findById(playlistId)
                 .switchIfEmpty(Mono.error(new Throwable(HttpStatus.NOT_FOUND.toString())))

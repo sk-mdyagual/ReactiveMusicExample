@@ -6,6 +6,7 @@ import ec.com.reactive.music.playlist.usecases.interfaces.DeletePlaylist;
 import ec.com.reactive.music.playlist.usecases.interfaces.GetPlaylistById;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -18,7 +19,7 @@ public class DeletePlaylistUseCase implements DeletePlaylist {
     private final PlaylistMapper playlistMapper;
 
     @Override
-    public Mono<String> applyUseCase(String playlistId) {
+    public Mono<String> applyUseCase(@PathVariable String playlistId) {
         return this.getPlaylistById
                 .getPlaylist(playlistId)
                 .map(playlistDTO -> {
