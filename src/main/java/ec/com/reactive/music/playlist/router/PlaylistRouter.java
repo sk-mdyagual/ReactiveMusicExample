@@ -83,7 +83,7 @@ public class PlaylistRouter {
 
     @Bean
     public RouterFunction<ServerResponse> removeSongFromPlaylist(RemoveSongUseCase removeSongUseCase, GetSongByIdUseCase getSongByIdUseCase){
-        return route(PUT("/playlist/add/{playlistId}/{songId}"),
+        return route(PUT("/playlist/remove/{playlistId}/{songId}"),
                 request -> getSongByIdUseCase.getSongById(request.pathVariable("songId"))
                         .flatMap(songDTO -> removeSongUseCase.removeFromPlaylist(request.pathVariable("playlistId"),songDTO )
                                 .flatMap(playlistDTO -> ServerResponse.ok()
