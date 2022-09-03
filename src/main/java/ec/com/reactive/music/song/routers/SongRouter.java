@@ -76,7 +76,7 @@ public class SongRouter {
             MediaType.APPLICATION_JSON_VALUE},
             beanClass = SaveSongUseCase.class, method = RequestMethod.POST, beanMethod = "save",
             operation = @Operation(operationId = "saveSongRouter", tags = "Song usecases", responses = {
-                    @ApiResponse(responseCode = "201", description = "Success",
+                    @ApiResponse(responseCode = "201", description = "Created",
                             content = @Content(schema = @Schema(implementation = SongDTO.class))),
                     @ApiResponse(responseCode = "406",description = "Not acceptable, maybe Song not Found to proceed or something else")}))
     RouterFunction<ServerResponse> saveSongRouter(SaveSongUseCase saveSongUseCase){
