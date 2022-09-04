@@ -15,7 +15,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document
+@Document(collection = "User")
 public class User {
 
     @Id
@@ -23,7 +23,7 @@ public class User {
 
     private String username;
 
-    @JsonIgnore
+    //@JsonIgnore
     private String password;
 
     private String email;

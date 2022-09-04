@@ -7,6 +7,7 @@ import ec.com.reactive.music.user.usecases.LoginUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.reactive.function.server.RouterFunction;
@@ -20,8 +21,9 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 public class AuthRouter {
     @Bean
     RouterFunction<ServerResponse> loginRouter(LoginUseCase loginUseCase){
-        return route(POST("/user/login"),
-                request -> loginUseCase.logIn(request.bodyToMono(AuthenticationRequest.class)));
+        return route(POST("/auth/login"),
+                request -> loginUseCase.logIn(request.bodyToMono(AuthenticationRequest.class))
+                        /*.onErrorResume(throwable -> ServerResponse.status(HttpStatus.FORBIDDEN).build())*/);
     }
 
     @Bean
@@ -33,7 +35,7 @@ public class AuthRouter {
 
     @Bean
     RouterFunction<ServerResponse> getCurrentUser(CurrentUserControllerUseCase currentUserControllerUseCase){
-        return route(GET(""),
+        return route(GET("/"),
                 request -> currentUserControllerUseCase.current(request.bodyToMono(UserDetails.class))
                         .flatMap(response -> ServerResponse.ok().bodyValue(response)));
     }

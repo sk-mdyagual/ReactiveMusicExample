@@ -4,6 +4,8 @@ import ec.com.reactive.music.user.jwt.JwtTokenProvider;
 import ec.com.reactive.music.user.model.AuthenticationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class LoginUseCase {
         return authenticationRequest
                 .flatMap(authRequest -> this.authenticationManager
                         .authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(),authRequest.getPassword()))
+                        //.onErrorMap(BadCredentialsException.class, err -> new Throwable(HttpStatus.FORBIDDEN.toString()))
                         .map(this.jwtTokenProvider::createToken))
                 .flatMap(jwt-> {
                     //HttpHeaders httpHeaders = new HttpHeaders();
