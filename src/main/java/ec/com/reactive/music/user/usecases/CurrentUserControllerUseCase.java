@@ -13,6 +13,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CurrentUserControllerUseCase {
     public Mono<Map<String, Object>> current(@AuthenticationPrincipal Mono<UserDetails> principal) {
+        System.out.println(principal);
         return principal.map(user -> Map.of(
                         "name", user.getUsername(),
                         "roles", AuthorityUtils.authorityListToSet(user.getAuthorities())

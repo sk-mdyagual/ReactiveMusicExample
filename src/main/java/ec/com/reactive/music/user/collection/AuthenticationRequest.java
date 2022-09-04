@@ -1,4 +1,4 @@
-package ec.com.reactive.music.user.model;
+package ec.com.reactive.music.user.collection;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

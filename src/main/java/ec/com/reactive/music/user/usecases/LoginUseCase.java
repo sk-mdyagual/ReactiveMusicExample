@@ -1,11 +1,9 @@
 package ec.com.reactive.music.user.usecases;
 
 import ec.com.reactive.music.user.jwt.JwtTokenProvider;
-import ec.com.reactive.music.user.model.AuthenticationRequest;
+import ec.com.reactive.music.user.collection.AuthenticationRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
