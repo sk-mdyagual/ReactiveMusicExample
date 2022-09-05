@@ -22,7 +22,7 @@ public class DataInitializer {
 
     @EventListener(value = ApplicationReadyEvent.class)
     public void init() {
-        Logger.getLogger("start data initialization...");
+        /*Logger.getLogger("start data initialization...");
         var initPosts = this.users.deleteAll()
                 .thenMany(
                         Flux.just("user", "admin")
@@ -45,7 +45,7 @@ public class DataInitializer {
                 .subscribe(
                         data -> System.out.println("data:" + data), err -> System.out.println("error:" + err),
                         () -> System.out.println("done initialization...")
-                );
+                );*/
 
 
     }

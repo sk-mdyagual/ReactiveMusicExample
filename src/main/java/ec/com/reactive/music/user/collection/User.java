@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "User")
@@ -34,7 +34,7 @@ public class User {
     @Builder.Default()
     private List<String> roles = new ArrayList<>();
 
-    public User(String s) {
+    /*public User(String s) {
 
-    }
+    }*/
 }

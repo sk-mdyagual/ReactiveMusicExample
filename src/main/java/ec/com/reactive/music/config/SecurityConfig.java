@@ -35,21 +35,24 @@ public class SecurityConfig {
     SecurityWebFilterChain springWebFilterChain(ServerHttpSecurity http,
                                                 JwtTokenProvider tokenProvider,
                                                 ReactiveAuthenticationManager reactiveAuthenticationManager) {
-        final String PATH_POSTS = "/album/**";
+        final String PATH_ALBUM = "/album/**";
+        final String PATH_SONG = "/song/**";
+        final String PATH_PLAYLIST = "/playlist/**";
+        final String PATH_USER = "/user/**";
 
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .authenticationManager(reactiveAuthenticationManager)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(it -> it
-                        //.pathMatchers(HttpMethod.GET, PATH_POSTS).hasRole("ROLE_USER")
-                        .pathMatchers(HttpMethod.DELETE, PATH_POSTS).hasRole("ADMIN")
-                        .pathMatchers(PATH_POSTS).authenticated()
+                        .pathMatchers(PATH_USER).hasAuthority("ROLE_ADMIN")
+                        .pathMatchers(PATH_ALBUM).hasAuthority("ROLE_USER")
+                        .pathMatchers(PATH_SONG).hasAuthority("ROLE_USER")
+                        .pathMatchers(PATH_PLAYLIST).hasAuthority("ROLE_USER")
                         .pathMatchers("/current").authenticated()
                         .pathMatchers("/user/{username}/**").access(this::currentUserMatchesPath)
                         .anyExchange().permitAll()
-                )
-                .addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
+                ).addFilterAt(new JwtTokenAuthenticationFilter(tokenProvider), SecurityWebFiltersOrder.HTTP_BASIC)
                 .build();
 
 
@@ -58,7 +61,6 @@ public class SecurityConfig {
 
     private Mono<AuthorizationDecision> currentUserMatchesPath(Mono<Authentication> authentication,
                                                                AuthorizationContext context) {
-
         return authentication
                 .map(a -> context.getVariables().get("user").equals(a.getName()))
                 .map(AuthorizationDecision::new);

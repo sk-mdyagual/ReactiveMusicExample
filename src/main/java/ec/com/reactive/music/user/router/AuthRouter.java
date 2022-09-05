@@ -1,18 +1,16 @@
 package ec.com.reactive.music.user.router;
 
 import ec.com.reactive.music.user.collection.AuthenticationRequest;
-import ec.com.reactive.music.user.usecases.CurrentUserControllerUseCase;
+import ec.com.reactive.music.user.collection.User;
+import ec.com.reactive.music.user.usecases.CreateUserUseCase;
 import ec.com.reactive.music.user.usecases.GetUsernameUseCase;
 import ec.com.reactive.music.user.usecases.LoginUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.reactive.function.server.RouterFunction;
-import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
@@ -55,6 +53,19 @@ public class AuthRouter {
                 //.doOnSuccess(s -> System.out.println("completed without value: " + s))
                 .flatMap(s -> ServerResponse.ok().bodyValue(s)));
     }
+
+    @Bean
+    RouterFunction<ServerResponse> saveUserMainRole (CreateUserUseCase createUserUseCase){
+        return route(POST("/auth/save/{role}"),
+                request -> request.bodyToMono(User.class)
+                        .flatMap(user -> request.pathVariable("role").equals("user")?
+                                createUserUseCase.save(user,"ROLE_USER") :
+                                createUserUseCase.save(user,"ROLE_ADMIN"))
+                        .flatMap(user -> ServerResponse.ok().bodyValue(user)));
+
+
+    }
+
 
 
 }
