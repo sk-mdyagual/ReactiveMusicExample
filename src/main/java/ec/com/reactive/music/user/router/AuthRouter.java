@@ -58,9 +58,9 @@ public class AuthRouter {
     RouterFunction<ServerResponse> saveUserMainRole (CreateUserUseCase createUserUseCase){
         return route(POST("/auth/save/{role}"),
                 request -> request.bodyToMono(User.class)
-                        .flatMap(user -> request.pathVariable("role").equals("user")?
-                                createUserUseCase.save(user,"ROLE_USER") :
-                                createUserUseCase.save(user,"ROLE_ADMIN"))
+                        .flatMap(user -> request.pathVariable("role").equals("admin")?
+                                createUserUseCase.save(user,"ROLE_ADMIN") :
+                                createUserUseCase.save(user,"ROLE_USER"))
                         .flatMap(user -> ServerResponse.ok().bodyValue(user)));
 
 

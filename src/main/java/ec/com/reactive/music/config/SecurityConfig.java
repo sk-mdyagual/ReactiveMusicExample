@@ -26,9 +26,8 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 import reactor.core.publisher.Mono;
 
 
-@Configuration
+
 @EnableWebFluxSecurity
-@EnableReactiveMethodSecurity
 public class SecurityConfig {
 
     @Bean
@@ -43,6 +42,7 @@ public class SecurityConfig {
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .authenticationManager(reactiveAuthenticationManager)
+                //The .securityContextRepository() will prevent it to create a WebSession, it is similar with STATELESS strategy in Servlet stack.
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(it -> it
                         .pathMatchers(PATH_USER).hasAuthority("ROLE_ADMIN")
@@ -69,7 +69,6 @@ public class SecurityConfig {
 
     @Bean
     public ReactiveUserDetailsService userDetailsService(IUserRepository users) {
-
         return username -> users.findByUsername(username)
                 .map(u -> User
                         .withUsername(u.getUsername()).password(u.getPassword())
@@ -93,6 +92,8 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+        //There is no PasswordEncoder mapped for the id "null"
+        // return new BCryptPasswordEncoder();
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
